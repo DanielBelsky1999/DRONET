@@ -261,7 +261,8 @@ class GroundSystem:
         GuiSender.SendXYZ(px_x,px_y,0)
         
         # Calibrate 
-        azimuth_deg, elevation_deg = self.calibrator.Calibrate(0, px_x, px_y)
+        FAKE_JETSON_ID = 0
+        azimuth_deg, elevation_deg = self.calibrator.Calibrate(FAKE_JETSON_ID, px_x, px_y)
 
         # LOG PIXELS
         self.logger.RecordTestMessage(px_x, px_y, azimuth_deg, elevation_deg)    
