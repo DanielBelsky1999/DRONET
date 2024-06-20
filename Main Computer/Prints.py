@@ -33,3 +33,7 @@ def PRINT_ROW(txt):
 def WHITE_PRINT(txt):
     with PrintLocker:
         print(f"{Fore.WHITE} " + str(txt) + f"{Style.RESET_ALL}") 
+        
+def CYAN_PRINT(txt):
+    with PrintLocker:
+        print(f"{Fore.CYAN} " + str(txt) + f"{Style.RESET_ALL}")
