@@ -1,5 +1,5 @@
 import socket
-from GuiSender import GuiSender
+# from GuiSender import GuiSender
  
 UDP_IP = "0.0.0.0"
 UDP_PORT = 30001

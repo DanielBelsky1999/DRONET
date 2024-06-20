@@ -1,14 +1,35 @@
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+from threading import Lock
+
+PrintLocker = Lock()
+colorama_init()
+
 def WARN(txt):
-    print("\n - WARNING:  " + str(txt))
+    with PrintLocker:
+        print(f"\n{Fore.YELLOW} - WARNING:  " + str(txt) + f"{Style.RESET_ALL}")
     
 def NOTIFY(txt):
-    print("\n " + str(txt))
-    
+    with PrintLocker:
+        print(f"\n{Fore.GREEN} " + str(txt) + f"{Style.RESET_ALL}")
+        
+def SYSTEM_NOTIFY(txt):
+    with PrintLocker:
+        print(f"\n{Fore.CYAN} " + str(txt) + f"{Style.RESET_ALL}")
+
 def ERROR(txt):
-    print("\n x ERROR:  " + str(txt))
+    with PrintLocker:
+        print(f"\n{Fore.RED} x ERROR:  " + str(txt) + f"{Style.RESET_ALL}")
     
 def DEBUG(txt):
-    print("\n # DEBUG:  " + str(txt))
+    with PrintLocker:
+        print(f"\n{Fore.LIGHTBLUE_EX} # DEBUG:  " + str(txt) + f"{Style.RESET_ALL}")
     
 def PRINT_ROW(txt):
-    print(" " + txt)
+    with PrintLocker:
+        print(f"{Fore.GREEN} " + str(txt) + f"{Style.RESET_ALL}")
+    
+def WHITE_PRINT(txt):
+    with PrintLocker:
+        print(f"{Fore.WHITE} " + str(txt) + f"{Style.RESET_ALL}") 

@@ -39,7 +39,7 @@ class Stations:
     def CheckID(self, jetson_id):
         # jetson_id should be in range (1,2, ... , number_of_stations)
         if (jetson_id < 1 or jetson_id > self.number_of_stations):
-            WARN("Jetson-Station {i} doesn't exist. Position NOT SET".format(i=jetson_id))
+            WARN("Jetson-Station {i} doesn't exist.".format(i=jetson_id))
             return False
         return True
     
@@ -95,15 +95,15 @@ class Stations:
     def PrintJetsonStation(self, jetson_id): # id should be in range 1-6
         jetson_i = self.stations_array[jetson_id - 1]
         euler_angles = jetson_i.orientation.GetEulerAnglesDeg()
-        print("\nStation{i}:".format(i=jetson_id))
-        print("Position: {position_np_arr}".format(position_np_arr =
+        NOTIFY("Station{i} SET:".format(i=jetson_id))
+        WHITE_PRINT("Position: {position_np_arr}".format(position_np_arr =
                                                        jetson_i.position))
-        print("Euler Angles RELATIVE TO ORIGIN SYSTEM:\n"
+        WHITE_PRINT("Euler Angles RELATIVE TO ORIGIN SYSTEM:\n"
         "   (psi,theta,phi) = ({psi:.4f}, {theta:.4f}, {phi:.4f})".format(psi=euler_angles[0],
                                                                         theta=euler_angles[1],
                                                                         phi=euler_angles[2]))
     def PrintAllJetsonStations(self):
-        print("- JETSON STATIONS DATA:")
+        WHITE_PRINT("- JETSON STATIONS DATA:")
         for jetson_id in range(self.number_of_stations):
             self.PrintJetsonStation(jetson_id + 1)
             

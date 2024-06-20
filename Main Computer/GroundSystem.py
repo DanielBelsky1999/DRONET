@@ -63,15 +63,18 @@ class GroundSystem:
             self.DONT_LAUNCH_THREAD = True
             
     def ShutDown(self):
-        NOTIFY("###### Closing Everyting.....  ")
+        WHITE_PRINT("\n###### Closing Everyting.....  ")
         self.stopConnectionChecker = True
         if (not self.DONT_LAUNCH_THREAD):
             self.server_socket.shutdown(socket.SHUT_RDWR)
             self.server_socket.close()
         else:
             DEBUG("server_socket wasn't initialized")
-            
-        self.logger.CloseAll()
+        
+        try:
+            self.logger.CloseAll()
+        except AttributeError:
+            DEBUG("logger wasn't instantiated")
     
     def ReceiveAndProcessMessages(self):
         if (self.DONT_LAUNCH_THREAD == False):
@@ -80,11 +83,13 @@ class GroundSystem:
                 try:
                     raw_data = self.RecvMessage()
                 except OSError: # socket was closed:
-                    NOTIFY("Socket closed")
                     break
                 data_packets = raw_data.split(";")
                 for packet in data_packets[0:-1]: # exclude last cell which is an empty string
-                    self.ParseMessage(packet)
+                    self.ParseMessage(packet)        
+            NOTIFY("ReceiveAndProcessMessages Thread END\n")
+                    
+            
         
     def RecvMessage(self):
         bytesAddressPair = self.server_socket.recvfrom(1024)
@@ -268,20 +273,21 @@ class GroundSystem:
         self.logger.RecordTestMessage(px_x, px_y, azimuth_deg, elevation_deg)    
     
     def ConnectionChecker(self):
-        while True:
-            if not self.stopConnectionChecker:
-                jetsons_disconnected = self.connectionChecker.Check()
-                for jetson_id in jetsons_disconnected:
-                    GuiSender.SendConnectionStatus(jetson_id, "DISCONNECTED")
-                    WARN("Jetson {i} Disconnected".format(i=jetson_id))
-            else:
-                break
-        NOTIFY("Connection Checker Thread END\n")
+        if (self.DONT_LAUNCH_THREAD == False):
+            NOTIFY("Connection Checker Alive")
+            while True:
+                if not self.stopConnectionChecker:
+                    jetsons_disconnected = self.connectionChecker.Check()
+                    for jetson_id in jetsons_disconnected:
+                        GuiSender.SendConnectionStatus(jetson_id, "DISCONNECTED")
+                        WARN("Jetson {i} Disconnected".format(i=jetson_id))
+                else:
+                    break
+            NOTIFY("Connection Checker Thread END\n")
         
         
     def PrintWelcome():
         space = " "*10
-        print()
         print()
         print(space + "##########################")
         print(space + "##########################")
@@ -289,7 +295,7 @@ class GroundSystem:
         print(space + "###      DRONET®       ###")
         print(space + "###                    ###")
         print(space + "###    Main Computer   ###")
-        print(space + "###       (beta)       ###")
+        print(space + "###       (v1.0)       ###")
         print(space + "###                    ###")
         print(space + "###                    ###")
         print(space + "##########################")

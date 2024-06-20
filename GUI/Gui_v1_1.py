@@ -1,17 +1,24 @@
-from tkinter import * 
-import matplotlib.pyplot as plt
-import matplotlib.table as tbl
-import matplotlib.ticker as ticker
-import matplotlib.animation as animation
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk) 
-import socket
-import threading
-from time import sleep
-import time
-import math
-import pyproj
-
+try:
+    from tkinter import * 
+    import matplotlib.pyplot as plt
+    import matplotlib.table as tbl
+    import matplotlib.ticker as ticker
+    import matplotlib.animation as animation
+    from matplotlib.figure import Figure 
+    from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk) 
+    import socket
+    import threading
+    from time import sleep
+    import time
+    import math
+    import pyproj
+except ModuleNotFoundError as e:
+    import ctypes
+    err_str = str(e)
+    ctypes.windll.user32.MessageBoxW(None, err_str, u"GUI ERROR", 0)
+    exit()
+    
+    
 deg2rad = math.pi/180
 
 class JetsonStation:

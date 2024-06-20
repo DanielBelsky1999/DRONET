@@ -2,7 +2,7 @@
 
 FOR /f %%F IN ('where pythonw.exe') DO (
  set python_executable=%%F
- goto run_GUI
+  goto run_GUI
 )
 :run_GUI
 start %python_executable% GUI/Gui_v1_1.py

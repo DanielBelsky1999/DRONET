@@ -48,16 +48,16 @@ def TestSend(px1, px2):
 # GUI_send(4, 32.00018, 35, 240, 90, 0, 0)
 # input("sent")
 
-# while True:
-    # STATION_send(1, 1920, 1080)
-    # sleep(0.01)
-    # STATION_send(3, 0, 0)
-    # sleep(0.01)
-    # STATION_send(2, 352, 468)
-    # sleep(0.01)
-    # STATION_send(4, 1568, 12)
-    # sleep(0.01)
-    # input("Asd")
+while True:
+    STATION_send(1, 1920, 1080)
+    sleep(0.01)
+    STATION_send(3, 0, 0)
+    sleep(0.01)
+    STATION_send(2, 352, 468)
+    sleep(0.01)
+    STATION_send(4, 1568, 12)
+    sleep(0.01)
+    input("Asd")
     
     # # # #STATION_send(2, 1920, 1080)
     # # # # sleep(0.01)
