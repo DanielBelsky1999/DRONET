@@ -1,3 +1,4 @@
+from CONFIG import CONFIG_GroundSystem
 from Stations import Stations
 from Origin import Origin
 from Logger import Logger
@@ -9,20 +10,6 @@ from Prints import *
 from GuiSender import GuiSender
 
 class GroundSystem:
-    
-    # System Configuration
-    TOTAL_NUM_OF_STATIONS = 6                     # Total Number of stations in the system
-    NUM_OF_STATIONS_FOR_CALCULATION = 4     # A calculation is performed when this number of LOS arrive
-    CONFIGURATION_MIN_NUM_OF_STATIONS = 4   # Below this number of stations - the system will not count as "configured"
-    
-    
-    # Constants
-    UDP_IP = "0.0.0.0"
-    UDP_PORT = 25001
-    
-    # Calibrator Constants
-    CAMERA_NUM = 1
-    LENS_NUM = 1
       
       
     # Constructor
@@ -32,21 +19,21 @@ class GroundSystem:
         self.DONT_LAUNCH_THREAD = False
         self.stopConnectionChecker = False
         
-        self.stations = Stations(GroundSystem.TOTAL_NUM_OF_STATIONS)
+        self.stations = Stations(CONFIG_GroundSystem.TOTAL_NUM_OF_STATIONS)
         self.Origin = Origin()
         
         # Logger - if it errors - close everything
         try:
-            self.logger = Logger(GroundSystem.TOTAL_NUM_OF_STATIONS, LogMATLAB = True, LogCSV = True, TestLog = True)
+            self.logger = Logger(CONFIG_GroundSystem.TOTAL_NUM_OF_STATIONS, LogMATLAB = True, LogCSV = True, TestLog = True)
         except PermissionError:
                 ERROR("Close all opened log files !!!! \n    Then Restart main !!\n")
                 self.DONT_LAUNCH_THREAD = True
                 return
         #
         
-        self.calibrator = Calibrator(GroundSystem.CAMERA_NUM, GroundSystem.LENS_NUM)   
+        self.calibrator = Calibrator()   
         self.SetUpSocket()  
-        self.connectionChecker = ConnectionChecker(GroundSystem.TOTAL_NUM_OF_STATIONS)
+        self.connectionChecker = ConnectionChecker(CONFIG_GroundSystem.TOTAL_NUM_OF_STATIONS)
         self.XYZ_solution = [0,0,0]
         self.systemIsConfigured = False
         self.OriginIsSet = False
@@ -57,9 +44,9 @@ class GroundSystem:
     def SetUpSocket(self):
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.server_socket.bind((GroundSystem.UDP_IP, GroundSystem.UDP_PORT))
+            self.server_socket.bind((CONFIG_GroundSystem.UDP_IP, CONFIG_GroundSystem.UDP_PORT))
         except OSError:
-            ERROR("     OSError. Make Sure port \'{port}\' is free".format(port=GroundSystem.UDP_PORT))
+            ERROR("     OSError. Make Sure port \'{port}\' is free".format(port=CONFIG_GroundSystem.UDP_PORT))
             self.DONT_LAUNCH_THREAD = True
             
     def ShutDown(self):
@@ -222,7 +209,7 @@ class GroundSystem:
             
             # 7. Check if the system is configured:
             if (self.systemIsConfigured == False):
-                if (self.stations.GetNumberOfConfiguredStations() == GroundSystem.CONFIGURATION_MIN_NUM_OF_STATIONS):
+                if (self.stations.GetNumberOfConfiguredStations() == CONFIG_GroundSystem.CONFIGURATION_MIN_NUM_OF_STATIONS):
                     self.systemIsConfigured = True
                     NOTIFY("Ground System Configured")
                 
@@ -241,7 +228,7 @@ class GroundSystem:
         self.stations.AddLOS(jetson_id, LOS)
         
         # # 4. Check Matrix - if it has "enough" rows - Calculate Solution! 
-        if (self.stations.GetNumberOfLOS_rows() == GroundSystem.NUM_OF_STATIONS_FOR_CALCULATION):
+        if (self.stations.GetNumberOfLOS_rows() == CONFIG_GroundSystem.NUM_OF_STATIONS_FOR_CALCULATION):
             # 4.1 Get the matrices
             position_matrix, LOS_matrix = self.stations.GetMatricesForSolver()            
             # 4.2 Pass to Least Squares Solver:

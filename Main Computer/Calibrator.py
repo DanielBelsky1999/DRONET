@@ -1,4 +1,4 @@
-# imports
+from CONFIG import CONFIG_Calibrator
 
 class Calibrator:
     
@@ -43,7 +43,9 @@ class Calibrator:
     ]
 
     
-    def __init__(self, camera_num, lens_option_num):
+    def __init__(self):
+        camera_num = CONFIG_Calibrator.CAMERA_NUM
+        lens_option_num = CONFIG_Calibrator.LENS_NUM
         self.params = Calibrator.params[(camera_num - 1) * 3 + (lens_option_num - 1)]
     
     def Calibrate(self, IGNORED_jetson_id, px1, px2):

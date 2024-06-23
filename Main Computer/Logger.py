@@ -1,15 +1,11 @@
 import os
 
+from CONFIG import CONFIG_Logger
 from Origin import Origin
 from Jetson import Jetson
 from Prints import *
 
 class Logger:
-    LogFolderDir = "Logs\\"
-    SystemLogFileMATLAB_name = "SystemLog.m"
-    DataLogFileMATLAB_name = "DataLog.m"
-    TestLogFileMATLAB_name = "test.m"
-    SystemLogFileCSV_name = "SystemLog.csv"
 
     HFileSystemLogMATLAB = None
     HFileDataLogMATLAB = None
@@ -25,14 +21,14 @@ class Logger:
         Logger.LogCSV = LogCSV
         Logger.TestLog = TestLog
         
-        MATLAB_SystemLog_path = Logger.LogFolderDir + Logger.SystemLogFileMATLAB_name
-        MATLAB_DataLog_path = Logger.LogFolderDir + Logger.DataLogFileMATLAB_name
-        CSV_log_path = Logger.LogFolderDir + Logger.SystemLogFileCSV_name
-        Test_log_path = Logger.LogFolderDir + Logger.TestLogFileMATLAB_name
+        MATLAB_SystemLog_path = CONFIG_Logger.LogFolderDir + CONFIG_Logger.SystemLogFileMATLAB_name
+        MATLAB_DataLog_path = CONFIG_Logger.LogFolderDir + CONFIG_Logger.DataLogFileMATLAB_name
+        CSV_log_path = CONFIG_Logger.LogFolderDir + CONFIG_Logger.SystemLogFileCSV_name
+        Test_log_path = CONFIG_Logger.LogFolderDir + CONFIG_Logger.TestLogFileMATLAB_name
         
-        if (not os.path.exists(Logger.LogFolderDir)):
-            os.mkdir(Logger.LogFolderDir)
-            NOTIFY("Created Folder: " + Logger.LogFolderDir)
+        if (not os.path.exists(CONFIG_Logger.LogFolderDir)):
+            os.mkdir(CONFIG_Logger.LogFolderDir)
+            NOTIFY("Created Folder: " + CONFIG_Logger.LogFolderDir)
         
         if (LogMATLAB):
             Logger.HFileSystemLogMATLAB = open(MATLAB_SystemLog_path, "w")
@@ -56,21 +52,21 @@ class Logger:
         if (Logger.LogMATLAB):
             try:
                 Logger.HFileSystemLogMATLAB.close()
-                PRINT_ROW(Logger.SystemLogFileMATLAB_name + " Closed successfully")
+                PRINT_ROW(CONFIG_Logger.SystemLogFileMATLAB_name + " Closed successfully")
                 Logger.HFileDataLogMATLAB.close()
-                PRINT_ROW(Logger.DataLogFileMATLAB_name + " Closed successfully")
+                PRINT_ROW(CONFIG_Logger.DataLogFileMATLAB_name + " Closed successfully")
             except AttributeError:
                 pass
         if (Logger.LogCSV):
             try:
                 Logger.HFileSystemLogCSV.close()
-                PRINT_ROW(Logger.SystemLogFileCSV_name + " Closed successfully")       
+                PRINT_ROW(CONFIG_Logger.SystemLogFileCSV_name + " Closed successfully")       
             except AttributeError: 
                 pass
         if (Logger.TestLog):
             try:
                 Logger.HFileTestLogMATLAB.close()
-                PRINT_ROW(Logger.TestLogFileMATLAB_name + " Closed successfully")       
+                PRINT_ROW(CONFIG_Logger.TestLogFileMATLAB_name + " Closed successfully")       
             except AttributeError: 
                 pass       
                 
