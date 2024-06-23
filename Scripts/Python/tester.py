@@ -57,6 +57,8 @@ while True:
     sleep(0.01)
     STATION_send(4, 1568, 12)
     sleep(0.01)
+    STATION_send(5, 1568, 12)
+    sleep(0.01)
     input("Asd")
     
     # # # #STATION_send(2, 1920, 1080)

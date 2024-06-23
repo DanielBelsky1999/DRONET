@@ -63,7 +63,7 @@ class GroundSystem:
             self.DONT_LAUNCH_THREAD = True
             
     def ShutDown(self):
-        WHITE_PRINT("\n###### Closing Everyting.....  ")
+        CYAN_PRINT("\n   Closing Everyting..... ")
         self.stopConnectionChecker = True
         if (not self.DONT_LAUNCH_THREAD):
             self.server_socket.shutdown(socket.SHUT_RDWR)
@@ -124,15 +124,20 @@ class GroundSystem:
                 psi = float(split_message[4])
                 theta = float(split_message[5])
                 phi = float(split_message[6])     
-
-                if (jetson_id == 0):
-                    self.SetOrigin(lat, lon, alt, psi, theta, phi)
-                else:     
-                    self.SetStation(jetson_id, lat, lon, alt, psi, theta, phi)
             
             except ValueError:
-                WARN("Something went wrong with conversion (str)->(float). \n"
-                     +"         Make sure you have filled all the fields.")
+                WARN("Parsing Gui Message FAILED. \n"
+                     +"     Make sure you have filled all the fields:\n"
+                     +"             Station No.        --> (int)\n"
+                     +"             *All Other fields* --> (float)")
+                return
+            
+            if (jetson_id == 0):
+                self.SetOrigin(lat, lon, alt, psi, theta, phi)
+            else:     
+                self.SetStation(jetson_id, lat, lon, alt, psi, theta, phi)
+            
+
         
         elif MESSAGE_HEADER == "UPDATE_ME":
             self.GuiFullUpdate()
@@ -152,7 +157,7 @@ class GroundSystem:
         
         
         except ValueError:
-            ERROR("Something Wrong with Conversion (str)->(float)")
+            WARN("Parsing Station Message FAILED.")
         
     def SetOrigin(self, lat, long, alt, psi, theta, phi):
         if (self.OriginIsSet == False):
@@ -178,42 +183,48 @@ class GroundSystem:
                                                                                 lat,
                                                                                 long,
                                                                                 alt)
-                                                            
+            
+            if (set_pos_successfully == False):
+                return
+
+            
             # 2. Set Station Orientation relative to ORIGIN Coordinate system, given ABSOLUTE angles
             # set_orientation_successfully = self.stations.SetJetsonOrientationRelativeToOriginSystem_ABSOLUTE_Angles(jetson_id, 
                                                                                                                 # self.Origin, 
                                                                                                                 # azimuth_rel_to_north, 
                                                                                                                 # pitch_up, 
                                                                                                                 # roll_right)
-            # 2. Set Station Orientation relative to ORIGIN Coordinate system, given RELATIVE angles
+           
+           # 2. Set Station Orientation relative to ORIGIN Coordinate system, given RELATIVE angles
             set_orientation_successfully = self.stations.SetJetsonOrientationRelativeToOriginSystem_RELATIVE_Angles(jetson_id, 
                                                                                                                 yaw_left, 
                                                                                                                 pitch_up, 
                                                                                                                 roll_right)
             
+            if (set_orientation_successfully == False):
+                return
             
-            if (set_pos_successfully and set_orientation_successfully):
-                
-                # 3. Increase the number of confugured stations
-                self.stations.SetStationConfigured(jetson_id)
-                
-                # 4. Notify in Console
-                self.stations.PrintJetsonStation(jetson_id)
-                #self.stations.PrintAllJetsonStations()
+            # 3. Increase the number of confugured stations
+            self.stations.SetStationConfigured(jetson_id)
+            
+            # 4. Notify in Console
+            self.stations.PrintJetsonStation(jetson_id)
+            #self.stations.PrintAllJetsonStations()
 
-                # 5. Send GUI message
-                POS = self.stations.GetJetsonPosXY_forGUI(jetson_id)
-                LOS = self.stations.GetJetsonMainAxisXY_forGUI(jetson_id)
-                GuiSender.SendJetsonPosition(jetson_id, POS, LOS)
-                GuiSender.SendJetsonPositionStatus(jetson_id, "SET")
-                
-                # 6. Record to Log Files
-                self.logger.RecordStation(jetson_id, self.stations.stations_array[jetson_id-1])
+            # 5. Send GUI message
+            POS = self.stations.GetJetsonPosXY_forGUI(jetson_id)
+            LOS = self.stations.GetJetsonMainAxisXY_forGUI(jetson_id)
+            GuiSender.SendJetsonPosition(jetson_id, POS, LOS)
+            GuiSender.SendJetsonPositionStatus(jetson_id, "SET")
+            
+            # 6. Record to Log Files
+            self.logger.RecordStation(jetson_id, self.stations.stations_array[jetson_id-1])
             
             # 7. Check if the system is configured:
-            if (self.stations.GetNumberOfConfiguredStations() == GroundSystem.CONFIGURATION_MIN_NUM_OF_STATIONS):
-                self.systemIsConfigured = True
-                NOTIFY("Ground System Configured")
+            if (self.systemIsConfigured == False):
+                if (self.stations.GetNumberOfConfiguredStations() == GroundSystem.CONFIGURATION_MIN_NUM_OF_STATIONS):
+                    self.systemIsConfigured = True
+                    NOTIFY("Ground System Configured")
                 
     def ProcessStationMessage(self, jetson_id, pixel_1, pixel_2):
         # 1. Clibrate:  
