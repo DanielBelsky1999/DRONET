@@ -17,7 +17,7 @@ def STATION_send(i, px1, px2):
     bytesToSend = message_string.encode()
     UDPSendingSocket.sendto(bytesToSend, SEND_TO_ADDR)
 
-with open('..//MATLAB//injection_data.csv', mode ='r')as file:
+with open('Scripts//MATLAB//injection_data.csv', mode ='r')as file:
     csvfile = csv.reader(file)
     i=1
     for line in csvfile:
@@ -28,5 +28,4 @@ with open('..//MATLAB//injection_data.csv', mode ='r')as file:
         
         STATION_send(cam_id, pix_1, pix_2)
         sleep(0.01)
-        
         
