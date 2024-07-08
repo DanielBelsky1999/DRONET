@@ -3,8 +3,8 @@ close all;
 
 
 %%  Load System Log
-run("..//Logs//SystemLog.m");
-run("..//Logs//DataLog.m");
+run("..//..//Logs//SystemLog.m");
+run("..//..//Logs//DataLog.m");
 
 %% 
 close all;
