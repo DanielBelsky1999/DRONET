@@ -145,7 +145,7 @@ for point_i = 1:length(Trajectory_elev_azim(1,:,1))
     end
 end
 fclose(FILE);
-disp("DONE");
+disp("DONE WITH CREATING INJECTION FILE");
 
 return;
 %% Analysis
