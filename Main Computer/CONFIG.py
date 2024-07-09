@@ -16,6 +16,8 @@ class CONFIG_GroundSystem:
     NUM_OF_STATIONS_FOR_CALCULATION = 4     # A calculation is performed when this number of LOS arrive
     CONFIGURATION_MIN_NUM_OF_STATIONS = 4   # Below this number of stations - the system will not count as "configured"
     
+    INJECTED_STATION_MESSAGE_WITH_TIMESTAMP = True
+    
     # Communication Socket:
     UDP_IP = "0.0.0.0"
     UDP_PORT = 25001

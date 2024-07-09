@@ -1,4 +1,5 @@
 import os
+import time
 
 from CONFIG import CONFIG_Logger
 from Origin import Origin
@@ -122,12 +123,14 @@ class Logger:
             self.jetson_LOS_histogram[jetson_id-1] = jetson_LOS_indx + 1  
             Logger.HFileDataLogMATLAB.write(txt)
     
-    def RecordSolution(self, XYZ_array):
+    # Notice that time_stamp is an OPTIONAL parameter.
+    # It is used for logging injected time_stamps...
+    def RecordSolution(self, XYZ_array, time_stamp = time.time()):
         if (Logger.LogMATLAB):
             new_line = "; \n"
             solution_indx = self.solution_index
             txt = "Solution({i},:) = ".format(i=self.solution_index)
-            txt += "[{i},{j},{k}]".format(i=XYZ_array[0], j=XYZ_array[1], k=XYZ_array[2]) + new_line
+            txt += "[{time},{i},{j},{k}]".format(time=time_stamp, i=XYZ_array[0], j=XYZ_array[1], k=XYZ_array[2]) + new_line
             self.solution_index = solution_indx + 1  
             Logger.HFileDataLogMATLAB.write(txt)
         

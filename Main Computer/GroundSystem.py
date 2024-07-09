@@ -37,6 +37,7 @@ class GroundSystem:
         self.XYZ_solution = [0,0,0]
         self.systemIsConfigured = False
         self.OriginIsSet = False
+        self.time_stamp = 0
         
         GuiSender.SendRESET()
         
@@ -134,6 +135,8 @@ class GroundSystem:
             jetson_id = int(split_message[0])
             pixel_1 = float(split_message[1])
             pixel_2 = float(split_message[2])
+            if CONFIG_GroundSystem.INJECTED_STATION_MESSAGE_WITH_TIMESTAMP:
+                self.time_stamp = float(split_message[3])
             
             notify_gui_new_station = self.connectionChecker.NewMessage(jetson_id)
             if (notify_gui_new_station):
@@ -234,7 +237,10 @@ class GroundSystem:
             # 4.2 Pass to Least Squares Solver:
             self.XYZ_solution = LeastSquaresSolver.Solve(position_matrix, LOS_matrix)
             # 4.3 Record Solution
-            self.logger.RecordSolution(self.XYZ_solution)
+            if CONFIG_GroundSystem.INJECTED_STATION_MESSAGE_WITH_TIMESTAMP:
+                self.logger.RecordSolution(self.XYZ_solution, self.time_stamp)
+            else:
+                self.logger.RecordSolution(self.XYZ_solution)
             
             # 5. Estimator:
             # TODO

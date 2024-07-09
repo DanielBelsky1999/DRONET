@@ -38,7 +38,7 @@ for station_i = 1:4
         quiver3(pos(1),pos(2),pos(3),vec(1),vec(2),vec(3),"off", "Color","y","LineWidth",0.8);
     end
 end
-scatter3(Solution(1,1),Solution(1,2),Solution(1,3))
+
 
 
 view(3);
