@@ -1,16 +1,20 @@
 close all;
 clear variables;
 
-t = 0:1/30:15;
+t = 0:1/30:30;
 
-x = 25+5*sin(5.*t);
-y = 25+5*cos(3.*t +10);
-z = 20+10*sin(t);
+% x = 25+5*sin(t);
+% y = 25+5*cos(t);
+% z = 7+0.5*t;
+
+x = 0.07.*(t+4.6).^2 -2.*(t-4.6) + 15;
+y = 50-t;
+z = 8*atan(0.5.*t - 7) - 6.*atan(0.5.*t-10)+ 15;
 
 % figure(Units = "normalized", Position=[0.0563 0.1991 0.8339 0.6157]);
 figure(); hold on;
 % subplot(1,2,1);
-plot3(x,y,z);
+plot3(x,y,z,".-");
 
 
 % 
@@ -28,7 +32,7 @@ plot3(x,y,z);
 cams_pos = [1.1089099908e+01 -3.3595082272e-10 -9.6773529616e-06;
             2.2178199991e+01 -7.1217698400e-11 -3.8707022709e-05;
             3.3267300250e+01 -1.9819523799e-10 -8.7093016935e-05;
-            3.9329437112e-05  2.8349008236e+01 -6.2940256218e-05];
+            3.9329437112e-05  2.8349008236e+01 -6.2940256218e-05;];
 
 Rz = @(psi) [cos(psi), sin(psi), 0;
             -sin(psi), cos(psi), 0;
@@ -48,7 +52,7 @@ DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(de
 camera_angles = [70, -20, 0.0000;
                 90, -20, 0;
                 110, -20, 0;
-                0, -20, 0.0000];
+                0, -10, 0.0000;];
 
 % camera_DCMs 
 
@@ -58,8 +62,6 @@ end
 
 
 
-VEC_LEN = 5;
-
 % Draw Origin System
 quiver3(0,0,0,50,0,0,"off", "Color","k","LineWidth",1);
 quiver3(0,0,0,0,50,0,"off", "Color","k","LineWidth",1);
@@ -68,15 +70,8 @@ quiver3(0,0,0,0,0,50,"off", "Color","k","LineWidth",1);
 % Draw Stations
 for i = 1:length(cams_pos)
     pos = cams_pos(i,:);
-    mat = reshape(camera_DCMs(i,:,:), 3,3)' .* VEC_LEN;
-% 
-%     quiver3(pos(1),pos(2),pos(3),mat(1,1),mat(2,1),mat(3,1),"off", "Color","r","LineWidth",1);
-%     quiver3(pos(1),pos(2),pos(3),mat(1,2),mat(2,2),mat(3,2),"off", "Color","g","LineWidth",1);
-%     quiver3(pos(1),pos(2),pos(3),mat(1,3),mat(2,3),mat(3,3),"off", "Color","b","LineWidth",1);
-
     scatter3(pos(1),pos(2),pos(3), 40,"MarkerFaceColor",'r', "Marker",'diamond');
 end
-
 
 Vertical_halfAngle_deg = 26.1;
 Horizontal_halfAngle_deg = 47;
@@ -171,35 +166,12 @@ disp("DONE WITH CREATING INJECTION FILE");
 return;
 %% Analysis
 
-clear Solution;
+clear Solution Stations;
+run("..//..//Logs//SystemLog.m");
 run("..//..//Logs//DataLog.m");
 
-figure(); hold on;
-
-% Draw Origin System
-% quiver3(0,0,0,50,0,0,"off", "Color","k","LineWidth",1);
-% quiver3(0,0,0,0,50,0,"off", "Color","k","LineWidth",1);
-% quiver3(0,0,0,0,0,50,"off", "Color","k","LineWidth",1);
-% Original Trajectory:
-p_true = plot3(x,y,z);
-% Calculated Trajectory:
-p_calc = plot3(Solution(:,2),Solution(:,3),Solution(:,4), "r");
-legend([p_true, p_calc],"Injected", "Calculated Position");
-
-
-xlabel("X");
-ylabel("Y");
-zlabel("Z");
-axis equal;
-% xlim([-20, 70]);
-% ylim([-20, 70]);
-% zlim([-20, 70]);
-view(3); grid on;
-
-
-%%
-clear Solution;
-run("..//..//Logs//DataLog.m");
+time_epsilon = 10^-9;
+dt = 1/30;
 
 % Calculate original distances from origin:
 Original_times = t;
@@ -208,24 +180,93 @@ Original_r = sqrt(r_squared);
 
 % Calculate solution distances from origin:
 Solution_times = Solution(:,1)-Solution(1,1);
-a = Solution(:,2:4).*Solution(:,2:4);
-b= a(:,1) + a(:,2) + a(:,3);
-Solution_r = sqrt(b);
 
-figure();
-plot(Solution_times);
-xlabel("Index");
-ylabel("Time [sec]");
-grid on;
+
+f1 = figure(); ax1 = subplot(1,1,1, "Parent", f1); hold on;
+f2 = figure(); ax2 = subplot(1,1,1, "Parent", f2); hold on;
+
+time_sub_array = [];
+Distance_error_sub_array = [];
+Calculated_Position_sub_array = [];
+
+for time_indx_solution = 1:length(Solution_times)    
+    time_indx_generated = fix((Solution_times(time_indx_solution)+time_epsilon)/dt)+1;
+    
+    %%%%%%%%%%%%%%%% Actual calculation:
+    
+    x2 = (x(time_indx_generated) - Solution(time_indx_solution,2))^2;
+    y2 = (y(time_indx_generated) - Solution(time_indx_solution,3))^2;
+    z2 = (z(time_indx_generated) - Solution(time_indx_solution,4))^2;
+    R = sqrt(x2 + y2 + z2);
+
+    distance_error_value = R;
+
+    %%%%
+    position_vec = [Solution(time_indx_solution,2), Solution(time_indx_solution,3), Solution(time_indx_solution,4)];
+    %%%%%%%%%%%%%%%%%
+
+    time_sub_array = [time_sub_array, t(time_indx_generated)];
+    Distance_error_sub_array = [Distance_error_sub_array, distance_error_value];
+    Calculated_Position_sub_array = [Calculated_Position_sub_array; position_vec];
+
+    if (time_indx_solution < length(Solution_times)) 
+        if (abs((Solution_times(time_indx_solution+1) - Solution_times(time_indx_solution))-dt) < time_epsilon)
+            continue;
+        end
+    end
+    % Plot:
+    plot(ax1, time_sub_array, Distance_error_sub_array,".-");
+    plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r.-");
+    % Reset the Arrays:
+    time_sub_array = [];
+    Distance_error_sub_array = [];
+    Calculated_Position_sub_array = [];
+end
+
+
+xlabel(ax1, "Time [sec]");
+ylabel(ax1, "Distance Error [m]");
+grid(ax1, "on");
+
+plot3(ax2,x,y,z,"Color",[0 0.4470 0.7410]);
+axis(ax2,"equal");
+% xlim(ax2,[-5, 55]);
+% ylim(ax2,[-5, 55]);
+% zlim(ax2,[-10, 55]);
+xlabel(ax2,"X");
+ylabel(ax2,"Y");
+zlabel(ax2,"Z");
+view(ax2,3); grid on;
+
 
 figure(); hold on;
-% Plot
-plot(Original_times,Original_r);
-plot(Solution_times,Solution_r);
-legend("Original", "Solution");
-xlabel("Time [sec]");
-ylabel("Distance From origin");
-grid on;
+plot3(x,y,z,".-");
+% Draw Stations
+for i = 1:length(cams_pos)
+    pos = cams_pos(i,:);
+    scatter3(pos(1),pos(2),pos(3), 40,"MarkerFaceColor",'r', "Marker",'diamond');
+end
+DrawCamsFOV(gca(), cams_pos, camera_angles, Vertical_halfAngle_deg, Horizontal_halfAngle_deg, depth_m);
+
+% Draw Stations from simulation:
+VEC_LEN = 10;
+for station_i = 1:length(Stations.position)
+    pos = Stations.position(station_i,:);
+    mat = reshape(Stations.Origin2StationDCM(station_i,:,:), 3,3)' .* VEC_LEN;
+
+    quiver3(pos(1),pos(2),pos(3),mat(1,1),mat(2,1),mat(3,1),"off", "Color","r","LineWidth",1);
+    quiver3(pos(1),pos(2),pos(3),mat(1,2),mat(2,2),mat(3,2),"off", "Color","g","LineWidth",1);
+    quiver3(pos(1),pos(2),pos(3),mat(1,3),mat(2,3),mat(3,3),"off", "Color","b","LineWidth",1);
+end
+
+axis equal;
+xlim([-5, 55]);
+ylim([-5, 55]);
+zlim([-10, 55]);
+xlabel("X");
+ylabel("Y");
+zlabel("Z");
+view(3); grid on;
 
 %% HELPER FUNCS 
 
@@ -254,7 +295,7 @@ function DrawCamsFOV(ax, cams_pos, camera_angles, Vertical_halfAngle_deg, Horizo
     % Scaling up the depth
     v_len = depth_m/([1,0,0]*v1);
     
-    colors = ['r', 'g', 'b', 'y', "#4DBEEE", "#D95319"];
+    colors = ['r', 'g', 'b', 'y', 'k', "m"];
     mat_size = size(cams_pos);
     for camera_i = 1:mat_size(1)
         psi = camera_angles(camera_i,1);
