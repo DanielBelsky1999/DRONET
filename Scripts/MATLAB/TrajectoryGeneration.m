@@ -1,24 +1,29 @@
-close all;
+% close all;
 clear variables;
 
 t = 0:1/30:30;
 
-% x = 25+5*sin(t);
-% y = 25+5*cos(t);
+% x = 35+5*sin(t);
+% y = 35+5*cos(t);
 % z = 7+0.5*t;
 
-x = 0.07.*(t+4.6).^2 -2.*(t-4.6) + 15;
-y = 50-t;
-z = 8*atan(0.5.*t - 7) - 6.*atan(0.5.*t-10)+ 15;
+x = -15.*sin(0.23.*t) + 34;
+y = 0.12.*t.*(t-30) + 50;
+z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;%+ 9*atan(0.5.*t-15) +12;
 
-% figure(Units = "normalized", Position=[0.0563 0.1991 0.8339 0.6157]);
+dx = diff(x);
+dy = diff(y);
+dz = diff(z);
+dt = 1/30;
+v = sqrt((dx/dt).^2 + (dy/dt).^2 + (dz/dt).^2);
+figure(); plot(t(1:end-1),v);
+
+% comet3(x(1:2:end),y(1:2:end),z(1:2:end));
+
 figure(); hold on;
 % subplot(1,2,1);
 plot3(x,y,z,".-");
 
-
-% 
-% figure();
 % comet3(x,y,z);
 
 %%%
@@ -49,10 +54,10 @@ Rx = @(phi) [1, 0       , 0       ;
 DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(deg2rad(psi));
 
 
-camera_angles = [70, -20, 0.0000;
-                90, -20, 0;
-                110, -20, 0;
-                0, -10, 0.0000;];
+camera_angles = [70, -25, 0.0000;
+                90, -25, 0;
+                80, -25, 0;
+                0, -25, 0.0000;];
 
 % camera_DCMs 
 
@@ -145,10 +150,13 @@ FILE = fopen("injection_data.csv", "w");
 
 for point_i = 1:length(Trajectory_elev_azim(1,:,1))
     for cams_i = 1:length(camera_angles)
-
-        pix_1 = 1920/2 - A*tan(Trajectory_elev_azim(cams_i, point_i, 2));
-        pix_2 = 1080/2 + B*tan(Trajectory_elev_azim(cams_i, point_i, 1));
         
+        az = Trajectory_elev_azim(cams_i, point_i, 2);
+        el = Trajectory_elev_azim(cams_i, point_i, 1);
+
+        pix_1 = 1920/2 - A*tan(az);
+        pix_2 = 1080/2 + B/cos(az)*tan(el);
+
         if (pix_1 > 1920 || pix_1 < 0)
             continue;
         end
@@ -241,6 +249,8 @@ view(ax2,3); grid on;
 
 figure(); hold on;
 plot3(x,y,z,".-");
+
+
 % Draw Stations
 for i = 1:length(cams_pos)
     pos = cams_pos(i,:);
@@ -287,12 +297,17 @@ function DrawCamsFOV(ax, cams_pos, camera_angles, Vertical_halfAngle_deg, Horizo
     DCM_cam2vec = @(psi, theta) Ry(deg2rad(theta))*Rz(deg2rad(psi));
     DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(deg2rad(psi));
     
-    v1 = DCM_cam2vec(Horizontal_halfAngle_deg, -Vertical_halfAngle_deg)'*[1;0;0];
-    v2 = DCM_cam2vec(-Horizontal_halfAngle_deg, -Vertical_halfAngle_deg)'*[1;0;0];
-    v3 = DCM_cam2vec(-Horizontal_halfAngle_deg, Vertical_halfAngle_deg)'*[1;0;0];
-    v4 = DCM_cam2vec(Horizontal_halfAngle_deg, Vertical_halfAngle_deg)'*[1;0;0];
+    % Calculation of corner elevation given image-canter elevation:
+    A = 1/tand(Vertical_halfAngle_deg);
+    A_star = A/cosd(Horizontal_halfAngle_deg);
+    corner_elevation = atand(1/A_star);
+
+    v1 = DCM_cam2vec(Horizontal_halfAngle_deg, -corner_elevation)'*[1;0;0];
+    v2 = DCM_cam2vec(-Horizontal_halfAngle_deg, -corner_elevation)'*[1;0;0];
+    v3 = DCM_cam2vec(-Horizontal_halfAngle_deg, corner_elevation)'*[1;0;0];
+    v4 = DCM_cam2vec(Horizontal_halfAngle_deg, corner_elevation)'*[1;0;0];
     
-    % Scaling up the depth
+    % Scaling up the vector fo the desired depth
     v_len = depth_m/([1,0,0]*v1);
     
     colors = ['r', 'g', 'b', 'y', 'k', "m"];
@@ -325,5 +340,21 @@ function DrawCamsFOV(ax, cams_pos, camera_angles, Vertical_halfAngle_deg, Horizo
         zc = points(:,3);
         patch(ax, xc(face_indx_sides), yc(face_indx_sides), zc(face_indx_sides), colors(camera_i), 'facealpha', 0.06);
         patch(ax, xc(face_indx_bottom), yc(face_indx_bottom), zc(face_indx_bottom), colors(camera_i), 'facealpha', 0.06);
+    
+        %%%%%
+        
+%         vg = DCM_cam2vec(0, -Vertical_halfAngle_deg)'*[1;0;0];
+%         v_len_g = depth_m/([1,0,0]*vg);
+%         vg_cam = DCM_ori2cam'*vg.*v_len_g;
+%         point = cams_pos(camera_i,:) + vg_cam';
+%         s=scatter3(point(1),point(2),point(3), 40,"MarkerEdgeColor",'k', "Marker",'.');
+% 
+%         vg = DCM_cam2vec(Horizontal_halfAngle_deg, 0)'*[1;0;0];
+%         v_len_g = depth_m/([1,0,0]*vg);
+%         vg_cam = DCM_ori2cam'*vg.*v_len_g;
+%         point = cams_pos(camera_i,:) + vg_cam';
+%         s=scatter3(point(1),point(2),point(3), 40,"MarkerEdgeColor",'k', "Marker",'.');
+        %%%%%
+    
     end
 end
