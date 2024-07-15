@@ -9,7 +9,7 @@ t = 0:1/30:30;
 % 
 x = -15.*sin(0.23.*t) + 34;
 y = 0.12.*t.*(t-30) + 50;
-z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;%+ 9*atan(0.5.*t-15) +12;
+z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;
 
 dx = diff(x);
 dy = diff(y);
@@ -54,10 +54,10 @@ Rx = @(phi) [1, 0       , 0       ;
 DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(deg2rad(psi));
 
 
-camera_angles = [70, -25, 0.0000;
-                90, -25, 0;
-                80, -25, 0;
-                0, -25, 0.0000;];
+camera_angles = [70, -15, 0.0000;
+                90, -15, 0;
+                80, -15, 0;
+                0, -15, 0.0000;];
 
 % camera_DCMs 
 
@@ -121,24 +121,24 @@ end
 
 %% Test
 
-for cam_i = 1:length(camera_DCMs)
-    for point_i = 1:length(x)
-        tehta_azimuth_vec = reshape(Trajectory_elev_azim(cam_i, point_i,:),1,2);
-        pos = cams_pos(cam_i,:);
-        vector_cam2drone_CAM = (Ry(Trajectory_elev_azim(cam_i,point_i,1))*Rz(Trajectory_elev_azim(cam_i, point_i,2)))'*[1;0;0]*Test_Length(cam_i, point_i);
-        DCM_or2cam = DCM_origin2camera(camera_angles(cam_i,1),camera_angles(cam_i,2),camera_angles(cam_i,3));
-        vector_cam2drone_ORIGIN = DCM_or2cam'*vector_cam2drone_CAM;
-
-        drone_position(cam_i, point_i,:) = pos' + vector_cam2drone_ORIGIN;
-    end
-end
-
-plot3(drone_position(1,:,1),drone_position(1,:,2),drone_position(1,:,3), "r--");
-plot3(drone_position(2,:,1),drone_position(2,:,2),drone_position(2,:,3), "g--");
-plot3(drone_position(3,:,1),drone_position(3,:,2),drone_position(3,:,3), "k--");
-plot3(drone_position(4,:,1),drone_position(4,:,2),drone_position(4,:,3), "y--");
-
-disp("DONE WITH TESTING");
+% for cam_i = 1:length(camera_DCMs)
+%     for point_i = 1:length(x)
+%         tehta_azimuth_vec = reshape(Trajectory_elev_azim(cam_i, point_i,:),1,2);
+%         pos = cams_pos(cam_i,:);
+%         vector_cam2drone_CAM = (Ry(Trajectory_elev_azim(cam_i,point_i,1))*Rz(Trajectory_elev_azim(cam_i, point_i,2)))'*[1;0;0]*Test_Length(cam_i, point_i);
+%         DCM_or2cam = DCM_origin2camera(camera_angles(cam_i,1),camera_angles(cam_i,2),camera_angles(cam_i,3));
+%         vector_cam2drone_ORIGIN = DCM_or2cam'*vector_cam2drone_CAM;
+% 
+%         drone_position(cam_i, point_i,:) = pos' + vector_cam2drone_ORIGIN;
+%     end
+% end
+% 
+% plot3(drone_position(1,:,1),drone_position(1,:,2),drone_position(1,:,3), "r--");
+% plot3(drone_position(2,:,1),drone_position(2,:,2),drone_position(2,:,3), "g--");
+% plot3(drone_position(3,:,1),drone_position(3,:,2),drone_position(3,:,3), "k--");
+% plot3(drone_position(4,:,1),drone_position(4,:,2),drone_position(4,:,3), "y--");
+% 
+% disp("DONE WITH TESTING");
 
 %% DROP TO FILE
 
@@ -230,7 +230,7 @@ for time_indx_solution = 1:length(Solution_times)
     end
     % Plot:
     plot(ax1, time_sub_array, Distance_error_sub_array,".-");
-    plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r--", "LineWidth",2);
+    plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r.--", "LineWidth",2);
     % Reset the Arrays:
     time_sub_array = [];
     Distance_error_sub_array = [];
