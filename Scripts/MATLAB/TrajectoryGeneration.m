@@ -6,7 +6,7 @@ t = 0:1/30:30;
 % x = 35+5*sin(t);
 % y = 35+5*cos(t);
 % z = 7+0.5*t;
-
+% 
 x = -15.*sin(0.23.*t) + 34;
 y = 0.12.*t.*(t-30) + 50;
 z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;%+ 9*atan(0.5.*t-15) +12;
@@ -154,8 +154,14 @@ for point_i = 1:length(Trajectory_elev_azim(1,:,1))
         az = Trajectory_elev_azim(cams_i, point_i, 2);
         el = Trajectory_elev_azim(cams_i, point_i, 1);
 
-        pix_1 = 1920/2 - A*tan(az);
-        pix_2 = 1080/2 + B/cos(az)*tan(el);
+%            THIS IS THE GEOMETRIC WAY TO SOLVE IT:
+%            pix_1 = 1920/2 - A*tan(az);
+%            pix_2 = 1080/2 + B/cos(az)*tan(el);
+       
+        
+        camera_num = 1;
+        option_num = 1;
+        [pix_1, pix_2] = camera_calibration_final_inverse(camera_num, option_num, -rad2deg(az), -rad2deg(el));
 
         if (pix_1 > 1920 || pix_1 < 0)
             continue;
@@ -224,7 +230,7 @@ for time_indx_solution = 1:length(Solution_times)
     end
     % Plot:
     plot(ax1, time_sub_array, Distance_error_sub_array,".-");
-    plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r.-");
+    plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r--", "LineWidth",2);
     % Reset the Arrays:
     time_sub_array = [];
     Distance_error_sub_array = [];
@@ -235,12 +241,11 @@ end
 xlabel(ax1, "Time [sec]");
 ylabel(ax1, "Distance Error [m]");
 grid(ax1, "on");
+title(ax1,"Error between injected and calculated paths");
 
-plot3(ax2,x,y,z,"Color",[0 0.4470 0.7410]);
+plot3(ax2,x,y,z,"Color",[0 0.4470 0.7410], "LineWidth",1);
 axis(ax2,"equal");
-% xlim(ax2,[-5, 55]);
-% ylim(ax2,[-5, 55]);
-% zlim(ax2,[-10, 55]);
+legend("Calculated path (MLS only, no Estimator)","Injected Path");
 xlabel(ax2,"X");
 ylabel(ax2,"Y");
 zlabel(ax2,"Z");
