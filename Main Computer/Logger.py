@@ -43,6 +43,7 @@ class Logger:
         self.jetson_LOS_histogram = [1 for i in range(num_of_stations)]
         # Initialize a solution counter
         self.solution_index = 1
+        self.solution_index_estimated = 1
         
         ### For Testing ###
         self.test_msg_indx = 1
@@ -133,7 +134,15 @@ class Logger:
             txt += "[{time},{i},{j},{k}]".format(time=time_stamp, i=XYZ_array[0], j=XYZ_array[1], k=XYZ_array[2]) + new_line
             self.solution_index = solution_indx + 1  
             Logger.HFileDataLogMATLAB.write(txt)
-        
+    
+    def RecordSolutionEstimated(self, XYZ_array, time_stamp):
+        if (Logger.LogMATLAB):
+            new_line = "; \n"
+            solution_indx = self.solution_index_estimated
+            txt = "SolutionEstimated({i},:) = ".format(i=self.solution_index_estimated)
+            txt += "[{time},{i},{j},{k}]".format(time=time_stamp, i=XYZ_array[0], j=XYZ_array[1], k=XYZ_array[2]) + new_line
+            self.solution_index_estimated = solution_indx + 1  
+            Logger.HFileDataLogMATLAB.write(txt)
         
     def RecordTestMessage(self, px1, px2, azimuth_deg, elevation_deg):
         if (Logger.LogMATLAB):

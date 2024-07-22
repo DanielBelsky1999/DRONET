@@ -5,6 +5,7 @@ from Logger import Logger
 from Calibrator import Calibrator
 from ConnectionChecker import ConnectionChecker
 from LeastSquaresSolver import LeastSquaresSolver
+from Estimator import Estimator
 import socket
 from Prints import *
 from GuiSender import GuiSender
@@ -31,13 +32,15 @@ class GroundSystem:
                 return
         #
         
-        self.calibrator = Calibrator()   
+        self.calibrator = Calibrator()  
+        self.estimator = Estimator()        
         self.SetUpSocket()  
         self.connectionChecker = ConnectionChecker(CONFIG_GroundSystem.TOTAL_NUM_OF_STATIONS)
         self.XYZ_solution = [0,0,0]
         self.systemIsConfigured = False
         self.OriginIsSet = False
         self.time_stamp = 0
+
         
         GuiSender.SendRESET()
         
@@ -243,7 +246,13 @@ class GroundSystem:
                 self.logger.RecordSolution(self.XYZ_solution)
             
             # 5. Estimator:
-            # TODO
+            if CONFIG_GroundSystem.INJECTED_STATION_MESSAGE_WITH_TIMESTAMP:
+                estimations, times = self.estimator.NewMeasurment(self.XYZ_solution, self.time_stamp)
+                for indx,time_stamp_i in enumerate(times):
+                    estimated_vector = estimations[:,indx]
+                    self.logger.RecordSolutionEstimated(estimated_vector[0:10:3], time_stamp_i)
+            else:
+                pass
             
             # 6. Send to GUI
             x = self.XYZ_solution[0]

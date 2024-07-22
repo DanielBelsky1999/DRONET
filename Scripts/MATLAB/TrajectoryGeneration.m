@@ -54,10 +54,10 @@ Rx = @(phi) [1, 0       , 0       ;
 DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(deg2rad(psi));
 
 
-camera_angles = [70, -15, 0.0000;
-                90, -15, 0;
-                80, -15, 0;
-                0, -15, 0.0000;];
+camera_angles = [70, -25, 0.0000;
+                90, -25, 0;
+                80, -25, 0;
+                0, -25, 0.0000;];
 
 % camera_DCMs 
 
@@ -196,7 +196,7 @@ Original_r = sqrt(r_squared);
 Solution_times = Solution(:,1)-Solution(1,1);
 
 
-f1 = figure(); ax1 = subplot(1,1,1, "Parent", f1); hold on;
+f1 = figure(); ax1 = subplot(1,2,1, "Parent", f1); hold on;
 f2 = figure(); ax2 = subplot(1,1,1, "Parent", f2); hold on;
 
 time_sub_array = [];
@@ -241,45 +241,64 @@ end
 xlabel(ax1, "Time [sec]");
 ylabel(ax1, "Distance Error [m]");
 grid(ax1, "on");
-title(ax1,"Error between injected and calculated paths");
+title(ax1,"Error between injected and calculated (LS) paths");
+
+% Estimation errors:
+for t_i = 1:length(t)-1
+    est_pos = SolutionEstimated(t_i,2:4);
+    pos = [x(t_i+1),y(t_i+1),z(t_i+1)];
+    e = est_pos - pos;
+    error_estimation(t_i) = norm(e);
+end
+
+ax3 = subplot(1,2,2, "Parent", f1);
+plot(ax3, t(2:end),error_estimation);
+xlabel(ax3, "Time [sec]");
+ylabel(ax3, "Distance Error [m]");
+grid(ax3, "on");
+title(ax3,"Error between injected and estimated paths");
+%%%%%%%%%%%%%%% 3D
 
 plot3(ax2,x,y,z,"Color",[0 0.4470 0.7410], "LineWidth",1);
+plot3(SolutionEstimated(:,2), SolutionEstimated(:,3), SolutionEstimated(:,4), "g","LineWidth",1);
 axis(ax2,"equal");
-legend("Calculated path (MLS only, no Estimator)","Injected Path");
+legend("Calculated path (MLS only, no Estimator)","Injected path","Estimated path");
 xlabel(ax2,"X");
 ylabel(ax2,"Y");
 zlabel(ax2,"Z");
 view(ax2,3); grid on;
 
 
-figure(); hold on;
-plot3(x,y,z,".-");
+%%%%%%%%%%%%%%%%%%%%%% Draw stations to compare
+
+% figure(); hold on;
+% plot3(x,y,z,".-");
 
 
-% Draw Stations
-for i = 1:length(cams_pos)
-    pos = cams_pos(i,:);
-    scatter3(pos(1),pos(2),pos(3), 40,"MarkerFaceColor",'r', "Marker",'diamond');
-end
-DrawCamsFOV(gca(), cams_pos, camera_angles, Vertical_halfAngle_deg, Horizontal_halfAngle_deg, depth_m);
-
-% Draw Stations from simulation:
-VEC_LEN = 10;
-for station_i = 1:length(Stations.position)
-    pos = Stations.position(station_i,:);
-    mat = reshape(Stations.Origin2StationDCM(station_i,:,:), 3,3)' .* VEC_LEN;
-
-    quiver3(pos(1),pos(2),pos(3),mat(1,1),mat(2,1),mat(3,1),"off", "Color","r","LineWidth",1);
-    quiver3(pos(1),pos(2),pos(3),mat(1,2),mat(2,2),mat(3,2),"off", "Color","g","LineWidth",1);
-    quiver3(pos(1),pos(2),pos(3),mat(1,3),mat(2,3),mat(3,3),"off", "Color","b","LineWidth",1);
-end
-
-axis equal;
-xlim([-5, 55]);
-ylim([-5, 55]);
-zlim([-10, 55]);
-xlabel("X");
-ylabel("Y");
-zlabel("Z");
-view(3); grid on;
+% % Draw Stations
+% for i = 1:length(cams_pos)
+%     pos = cams_pos(i,:);
+%     scatter3(pos(1),pos(2),pos(3), 40,"MarkerFaceColor",'r', "Marker",'diamond');
+% end
+% DrawCamsFOV(gca(), cams_pos, camera_angles, Vertical_halfAngle_deg, Horizontal_halfAngle_deg, depth_m);
+% 
+% % Draw Stations from simulation:
+% VEC_LEN = 10;
+% for station_i = 1:length(Stations.position)
+%     pos = Stations.position(station_i,:);
+%     mat = reshape(Stations.Origin2StationDCM(station_i,:,:), 3,3)' .* VEC_LEN;
+% 
+%     quiver3(pos(1),pos(2),pos(3),mat(1,1),mat(2,1),mat(3,1),"off", "Color","r","LineWidth",1);
+%     quiver3(pos(1),pos(2),pos(3),mat(1,2),mat(2,2),mat(3,2),"off", "Color","g","LineWidth",1);
+%     quiver3(pos(1),pos(2),pos(3),mat(1,3),mat(2,3),mat(3,3),"off", "Color","b","LineWidth",1);
+% end
+% 
+% axis equal;
+% xlim([-5, 55]);
+% ylim([-5, 55]);
+% zlim([-10, 55]);
+% xlabel("X");
+% ylabel("Y");
+% zlabel("Z");
+% view(3); grid on;
 
