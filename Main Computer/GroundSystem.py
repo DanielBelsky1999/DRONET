@@ -102,7 +102,7 @@ class GroundSystem:
             
     def ParseGuiMessage(self, split_message):
         MESSAGE_HEADER = split_message[0]
-        if MESSAGE_HEADER == "POS":
+        if MESSAGE_HEADER == "POS_LLH":
             split_message = split_message[1:] # Cut off the message header
             try:
                 jetson_id = int(split_message[0])

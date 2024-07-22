@@ -517,7 +517,7 @@ class Window:
 
         
     def SetButtonPress(self):
-        message_string = "GUI,POS,{jetson_indx},{LAT},{LON},{ALT},{PSI},{THETA},{PHI};".format(
+        message_string = "GUI,POS_LLH,{jetson_indx},{LAT},{LON},{ALT},{PSI},{THETA},{PHI};".format(
                                jetson_indx=self.station_number.get(),
                                LAT = self.Station_Lat.get(),
                                LON = self.Station_Lon.get(),
