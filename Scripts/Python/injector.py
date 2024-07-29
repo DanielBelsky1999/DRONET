@@ -19,7 +19,7 @@ def STATION_send(i, px1, px2, time_stamp):
     UDPSendingSocket.sendto(bytesToSend, SEND_TO_ADDR)
 
 
-with open('Scripts//MATLAB//injection_data.csv', mode ='r')as file:
+with open('Scripts//MATLAB//InjectedData//injection_data.csv', mode ='r')as file:
     csvfile = csv.reader(file)
     i=1
     for line in csvfile:
