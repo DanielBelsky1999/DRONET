@@ -1,19 +1,67 @@
-% close all;
-clear variables;
+close all;
+try
+    iteratzia_NO = iteratzia_NO + 1;
+    clearvars -except iteratzia_NO
+catch
+    iteratzia_NO = 1;
+end
+%% Errors
+mu_err = 0;
+
+
+% % % 1
+% % section_NO = 1;
+% % position_sigma = 0;
+% % angle_sigma = 0;
+% % pixel_sigma = 0; % trust me
+% % 
+% % % 2
+% % section_NO = 2;
+% % position_sigma = 0.5;
+% % angle_sigma = 0;
+% % pixel_sigma = 0; % trust me
+
+% 3
+section_NO = 3;
+position_sigma = 0;
+angle_sigma = 0.2;
+pixel_sigma = 0; % trust me
+
+% % % 4 
+% % section_NO = 4;
+% % position_sigma = 0;
+% % angle_sigma = 0;
+% % pixel_sigma = 7; % trust me
+% % 
+% % % 5 
+% % section_NO = 5;
+% % position_sigma = 0.5;
+% % angle_sigma = 0.2;
+% % pixel_sigma = 7; % trust me
+
+
+%%
 
 disp("Creating File...");
 
 dt = 1/30;
-t = 0:dt:30;
 
-% x = 35+5*sin(t);
-% y = 35+5*cos(t);
-% z = 7+0.5*t;
-% 
+% trajectory 1
+trajectory_NO = 1;
+t = 0:dt:30;
 x = -15.*sin(0.23.*t) + 34;
 y = 0.12.*t.*(t-30) + 50;
 z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;
-% 
+
+% trajectory 2
+trajectory_NO = 2;
+t = 0:dt:50;
+x = 35+10*sin(0.13*t);
+y = 36+26*sin(0.13*t).*cos(0.13*t);
+z = 18+10*sin(0.08*t);
+
+
+% % velocities
 % dx = diff(x);
 % dy = diff(y);
 % dz = diff(z);
@@ -24,23 +72,31 @@ z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;
 % comet3(x(1:2:end),y(1:2:end),z(1:2:end));
 
 figure(); hold on;
-% subplot(1,2,1);
 plot3(x,y,z,".-");
 
-% comet3(x,y,z);
-
 %%%
-% origin pos   = 32     , 35     , 240
-% station1 pos = 32.0001, 35     , 240
-% station2 pos = 32.0002, 35     , 240
-% station3 pos = 32.0003, 35     , 240
-% station4 pos = 32     , 34.9997, 240
+% ORIGIN pos   = 32      , 35     , 240   ,   0,  0,0
+% station1 pos = 32.00008, 35     , 240   ,   70, 25,0 
+% station2 pos = 32.00022, 35     , 240   ,   90, 25,0
+% station3 pos = 32.00040 ,35     , 240   ,   110,25,0
+% station4 pos = 32      , 34.9999, 240   ,   30,25,0
+% station4 pos = 32      , 34.99975, 240  ,   0,25,0
+% station6 pos = 32      , 34.9995, 240   ,   -30,25,0
 %%%
 
-cams_pos = [1.1089099908e+01 -3.3595082272e-10 -9.6773529616e-06;
-            2.2178199991e+01 -7.1217698400e-11 -3.8707022709e-05;
-            3.3267300250e+01 -1.9819523799e-10 -8.7093016935e-05;
-            3.9329437112e-05  2.8349008236e+01 -6.2940256218e-05;];
+cams_pos = [8.8712799126e+00  3.7249758834e-11 -6.1934059024e-06;
+            2.4396020029e+01 -4.6201353853e-10 -4.6835781419e-05;
+            4.4356400681e+01 -1.0593836917e-10 -1.5483184173e-04;
+            4.3700543668e-06  9.4496694118e+00 -6.9935488966e-06;
+            2.7311974954e-05  2.3624173530e+01 -4.3708296574e-05;
+            1.0924804709e-04  4.7248347060e+01 -1.7483342198e-04];
+
+% Add errors
+for i = 1:6
+    for j = 1:3
+        cams_pos(i,j) = cams_pos(i,j) + normrnd(mu_err, position_sigma);
+    end
+end
 
 Rz = @(psi) [cos(psi), sin(psi), 0;
             -sin(psi), cos(psi), 0;
@@ -57,10 +113,20 @@ Rx = @(phi) [1, 0       , 0       ;
 DCM_origin2camera = @(psi, theta, phi) Rx(deg2rad(phi))*Ry(deg2rad(theta))*Rz(deg2rad(psi));
 
 
-camera_angles = [70, -15, 0.0000;
-                90, -15, 0;
-                80, -15, 0;
-                0, -15, 0.0000;];
+camera_angles = [70, -25, 0.0000;
+                90, -25, 0;
+                110, -25, 0;
+                30, -25, 0;
+                0, -25, 0;
+                -30,-25,0];
+
+% Add errors
+for i = 1:6
+    for j = 1:3
+        camera_angles(i,j) = camera_angles(i,j) + normrnd(mu_err, angle_sigma);
+    end
+end
+
 
 % camera_DCMs 
 
@@ -145,9 +211,6 @@ end
 
 %% DROP TO FILE
 
-A = (1920/2)/tand(47);
-B = (1080/2)/tand(26.1);
-
 if ~exist("InjectedData", 'dir')
    mkdir("InjectedData");
    disp("Created Directory 'InjectedData\'");
@@ -169,6 +232,9 @@ for point_i = 1:length(Trajectory_elev_azim(1,:,1))
         camera_num = 1;
         option_num = 1;
         [pix_1, pix_2] = camera_calibration_final_inverse(camera_num, option_num, -rad2deg(az), -rad2deg(el));
+        
+        pix_1 = pix_1 + round(normrnd(mu_err, pixel_sigma));
+        pix_2 = pix_2 + round(normrnd(mu_err, pixel_sigma));
 
         if (pix_1 > 1920 || pix_1 < 0)
             continue;
@@ -184,7 +250,7 @@ end
 fclose(FILE);
 disp("DONE WITH CREATING INJECTION FILE injection_data.csv");
 
-save("InjectedData\injected_data.mat", ...
+save(sprintf("InjectedData\\injected_dat_section%.0f_iter%.0f.mat",section_NO,iteratzia_NO), ...
     'x', ...
     'y', ...
     'z', ...

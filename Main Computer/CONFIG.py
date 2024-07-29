@@ -13,7 +13,7 @@
 class CONFIG_GroundSystem:
     
     TOTAL_NUM_OF_STATIONS = 6                     # Total Number of stations in the system
-    NUM_OF_STATIONS_FOR_CALCULATION = 4     # A calculation is performed when this number of LOS arrive
+    NUM_OF_STATIONS_FOR_CALCULATION = 4    # A calculation is performed when this number of LOS arrive
     CONFIGURATION_MIN_NUM_OF_STATIONS = 4   # Below this number of stations - the system will not count as "configured"
     
     INJECTED_STATION_MESSAGE_WITH_TIMESTAMP = True
