@@ -8,23 +8,17 @@ class Estimator:
         self.currentTime = 0.
         self.estimatedState = numpy.zeros((9, 1))
 
-        #print(self.estimatedState, end="\n\n")
 
         self.P_i = numpy.array([[1, self.dT, 0.5 * self.dT ** 2],
                                 [0., 1, self.dT],
                                 [0., 0., 1]])
 
-        #print(self.P_i, end="\n\n")
         a = self.P_i.shape[0]
         self.Phi_k = numpy.zeros((9, 9))
         self.Phi_k[0:3, 0:3] = self.P_i
         self.Phi_k[3:6, 3:6] = self.P_i
         self.Phi_k[6:9, 6:9] = self.P_i
 
-        #big_matrix[start_row:start_row + small_matrix.shape[0],
-        #start_col:start_col + small_matrix.shape[1]] = small_matrix
-
-        #print(self.Phi_k, end="\n\n")
 
         self.G = numpy.array([[0, 0, 0],
                               [0, 0, 0],
@@ -36,22 +30,16 @@ class Estimator:
                               [0, 0, 0],
                               [0, 0, 1]])
 
-        #print(self.G, end="\n\n")
 
         Q = (0.5) ** 2
         self.Q_k = self.G @ self.G.T *self.dT*Q
 
-
-        #print(self.Q_k, end="\n\n")
-
         self.z = numpy.zeros((3, 1))
-        #print(self.z, end="\n\n")
-
+        
         self.H = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
                               [0, 0, 0, 1, 0, 0, 0, 0, 0],
                               [0, 0, 0, 0, 0, 0, 1, 0, 0]])
 
-        #print(self.H, end="\n\n")
 
         self.measurement_sigma = 0.5
         self.R = numpy.diag(numpy.full(3, self.measurement_sigma ** 2))
@@ -68,7 +56,6 @@ class Estimator:
         self.P_est[6:9, 6:9] = self.P_est_i
 
     def NewMeasurment(self, XYZ_solution, solution_time):
-        #solution_time = XYZt_solution[3]
         measurement = numpy.array(XYZ_solution)
         row_vector = measurement.reshape(1, -1)
         self.z = row_vector.T
@@ -76,7 +63,6 @@ class Estimator:
         time_vector = []
         epsilon = 10**-5
         while (abs(self.currentTime - solution_time) > epsilon):
-            print("in loop")
             # Kalman filter run
             # Predict
             dim = len(self.X_est)
@@ -87,7 +73,6 @@ class Estimator:
             P_pred = numpy.dot(numpy.dot(self.Phi_k, self.P_est), self.Phi_k.T) + self.Q_k
 
             if(abs(solution_time - self.currentTime - self.dT) < epsilon):
-                print("in if")
                 # Update:
                 # step 3: kalman gain calculation at time k+1
                 S = numpy.dot(numpy.dot(self.H, P_pred), self.H.T) + self.R
