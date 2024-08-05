@@ -15,17 +15,17 @@ mu_err = 0;
 % % angle_sigma = 0;
 % % pixel_sigma = 0; % trust me
 % % 
-% % % 2
-% % section_NO = 2;
-% % position_sigma = 0.5;
-% % angle_sigma = 0;
-% % pixel_sigma = 0; % trust me
+% 2
+section_NO = 2;
+position_sigma = 0.5;
+angle_sigma = 0;
+pixel_sigma = 0; % trust me
 
 % 3
-section_NO = 3;
-position_sigma = 0;
-angle_sigma = 0.2;
-pixel_sigma = 0; % trust me
+% section_NO = 3;
+% position_sigma = 0;
+% angle_sigma = 0.2;
+% pixel_sigma = 0; % trust me
 
 % % % 4 
 % % section_NO = 4;
@@ -54,11 +54,11 @@ y = 0.12.*t.*(t-30) + 50;
 z = 15*atan(0.5.*t - 5) - 14.*atan(0.5.*t-7)+ 5.*atan(0.5.*(t-25)) +12 ;
 
 % trajectory 2
-trajectory_NO = 2;
-t = 0:dt:50;
-x = 35+10*sin(0.13*t);
-y = 36+26*sin(0.13*t).*cos(0.13*t);
-z = 18+10*sin(0.08*t);
+% % trajectory_NO = 2;
+% % t = 0:dt:50;
+% % x = 35+10*sin(0.13*t);
+% % y = 36+26*sin(0.13*t).*cos(0.13*t);
+% % z = 18+10*sin(0.08*t);
 
 
 % % velocities

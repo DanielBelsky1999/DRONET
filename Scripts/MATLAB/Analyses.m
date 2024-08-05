@@ -1,7 +1,7 @@
 %% Analysis
 
 clear variables;
-load("InjectedData\injected_data.mat");
+load("InjectedData.mat");
 
 run("..//..//Logs//SystemLog.m");
 run("..//..//Logs//DataLog.m");
