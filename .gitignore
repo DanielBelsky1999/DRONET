@@ -1,3 +1,5 @@
 **/__pycache__/
 Logs/
 Scripts/MATLAB/InjectedData
+*.jpg
+Scripts/MATLAB/Copy_of_TrajectoryGeneration.m

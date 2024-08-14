@@ -508,7 +508,7 @@ class Window:
         self.bar_plot.yaxis.tick_right()
         # placing the canvas on the Tkinter window 
         self.canvas2.get_tk_widget().pack()
-        self.bar_plot.set_ylim(0, 20)
+        self.bar_plot.set_ylim(0, 50)
         self.bar_plot.set_xlim(-1.1,1)
         self.bar, = self.bar_plot.bar([0],[7], width=1.87)
         self.bar_plot.tick_params(axis='x',which='both', bottom=False, top=False, labelbottom=False)

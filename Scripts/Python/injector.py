@@ -30,7 +30,7 @@ with open('Scripts//MATLAB//InjectedData//injection_data.csv', mode ='r')as file
         print(cam_id, pix_1, pix_2, time_stamp)
         
         STATION_send(cam_id, pix_1, pix_2, time_stamp)
-        
+        time.sleep(0.01)
         
         
 input("PRESS ENTER TO CLOSE injector.py")

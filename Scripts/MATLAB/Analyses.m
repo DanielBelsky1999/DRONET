@@ -1,7 +1,7 @@
 %% Analysis
 
-clear variables;
-load("InjectedData.mat");
+clear all;
+load("InjectedData\\InjectedData.mat");
 
 run("..//..//Logs//SystemLog.m");
 run("..//..//Logs//DataLog.m");
@@ -59,7 +59,7 @@ ylabel(ax1, "Distance Error [m]");
 grid(ax1, "on");
 title(ax1,"Error between injected and calculated (LS) paths");
 
-% Estimation errors:
+% % Estimation errors:
 for t_i = 1:length(t)-1
     est_pos = SolutionEstimated(t_i,2:4);
     pos = [x(t_i+1),y(t_i+1),z(t_i+1)];
