@@ -46,7 +46,7 @@ for time_indx_solution = 1:length(Solution_times)
     end
     % Plot:
     plot(ax1, time_sub_array, Distance_error_sub_array,".-");
-    p_calc = plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r.--", "LineWidth",2);
+    p_calc = plot3(ax2, Calculated_Position_sub_array(:,1), Calculated_Position_sub_array(:,2), Calculated_Position_sub_array(:,3),"r.", "LineWidth",2);
     % Reset the Arrays:
     time_sub_array = [];
     Distance_error_sub_array = [];
@@ -78,7 +78,7 @@ title(ax3,"Error between injected and estimated paths");
 p_real = plot3(ax2,x,y,z,"Color",[0 0.4470 0.7410], "LineWidth",1);
 p_est = plot3(SolutionEstimated(:,2), SolutionEstimated(:,3), SolutionEstimated(:,4), "g","LineWidth",1);
 axis(ax2,"equal");
-legend([p_calc,p_real,p_est], "Calculated path (MLS only, no Estimator)","Injected path","Estimated path");
+legend([p_real,p_calc,p_est],"Injected path","Calculated path (MLS only, no Estimator)","Estimated path");
 xlabel(ax2,"X");
 ylabel(ax2,"Y");
 zlabel(ax2,"Z");

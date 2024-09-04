@@ -10,10 +10,10 @@ mu_err = 0;
 
 
 % 1
-section_NO = 1;
-position_sigma = 0;
-angle_sigma = 0;
-pixel_sigma = 0; % trust me
+% section_NO = 1;
+% position_sigma = 0;
+% angle_sigma = 0;
+% pixel_sigma = 0; % trust me
 
 % 2
 % section_NO = 2;
@@ -34,10 +34,10 @@ pixel_sigma = 0; % trust me
 % % pixel_sigma = 7; % trust me
 % % 
 % % % 5 
-% % section_NO = 5;
-% % position_sigma = 0.5;
-% % angle_sigma = 0.2;
-% % pixel_sigma = 7; % trust me
+section_NO = 5;
+position_sigma = 0.5;
+angle_sigma = 0.2;
+pixel_sigma = 7; % trust me
 
 
 %%
